@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline CRM</title>
+<style>
+:root{--bg:#f4f6f8;--panel:#fff;--line:#e3e7ec;--text:#15181d;--muted:#6b7280;--accent:#2563eb;--soft:#eef4ff;--green:#0f9d58;--red:#e5484d;--amber:#e8890c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:10px;padding:0 18px;height:54px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.brand{font-weight:700}
+.brand i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;font-style:normal;margin-right:7px}
+.sp{flex:1}
+.btn{border:1px solid var(--line);background:#fff;padding:7px 12px;border-radius:8px;font-weight:500;white-space:nowrap}
+.btn:hover{background:#fafbfc;border-color:#d3d8e0}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:#1d4ed8}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn.dgr{color:var(--red);border-color:#f3c9cb}
+.btn.dgr:hover{background:#fdf0f0}
+nav{display:flex;gap:2px;padding:8px 18px 0;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:54px;z-index:19;overflow-x:auto}
+.tab{background:none;border:0;padding:8px 13px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;border-radius:8px 8px 0 0;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);background:var(--soft)}
+main{padding:18px;max-width:1500px;margin:0 auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.phead{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line);font-weight:600}
+.pbody{padding:15px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.stat .l{color:var(--muted);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+.stat .v{font-size:23px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
+.stat .s{color:var(--muted);font-size:12px;margin-top:4px}
+.stat.alert .v{color:var(--red)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:880px){.two{grid-template-columns:1fr}}
+.brow{display:grid;grid-template-columns:100px 1fr 78px;gap:10px;align-items:center;padding:5px 0;font-size:13px}
+.btrack{background:#eef0f3;border-radius:6px;height:20px;overflow:hidden}
+.bfill{height:100%;border-radius:6px;min-width:2px}
+.bval{text-align:right;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfc;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+tbody tr:hover{background:#fafbfc}
+tbody tr:last-child td{border-bottom:0}
+.t-right{text-align:right}
+.t-num{font-variant-numeric:tabular-nums;font-weight:600}
+.nowrap{white-space:nowrap}
+.sub{color:var(--muted);font-size:12px;margin-top:2px}
+.none{text-align:center;color:var(--muted);padding:30px 10px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill i{width:6px;height:6px;border-radius:50%;display:inline-block}
+.own{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.av{width:24px;height:24px;border-radius:50%;background:#e8ecf3;color:#455;display:inline-grid;place-items:center;font-size:10px;font-weight:700;flex:none}
+.late{color:var(--red);font-weight:600}
+.kan{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+.kcol{flex:0 0 240px;background:#eef0f4;border-radius:10px;display:flex;flex-direction:column;max-height:calc(100vh - 210px)}
+.khead{display:flex;align-items:center;gap:6px;padding:9px 11px;font-size:12.5px;font-weight:600;border-bottom:1px solid #e2e5ea}
+.kdot{width:8px;height:8px;border-radius:50%;flex:none}
+.kcount{background:#dfe3ea;color:#4b5563;border-radius:20px;padding:0 7px;font-size:11px}
+.ktotal{margin-left:auto;color:var(--muted);font-size:11.5px;font-weight:600}
+.kbody{padding:8px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;min-height:60px}
+.kbody.over{background:#e3ecff;outline:2px dashed var(--accent);outline-offset:-6px;border-radius:8px}
+.kcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px;cursor:grab;box-shadow:0 1px 2px rgba(16,24,40,.06)}
+.kcard:hover{border-color:#c9d2e0}
+.kcard.drag{opacity:.4}
+.ktitle{font-weight:600;font-size:13px;line-height:1.3}
+.ksub{color:var(--muted);font-size:12px;margin-bottom:7px}
+.kfoot{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.kval{font-weight:700}
+.kfu{margin-top:7px;padding-top:7px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted)}
+.kfu.late{color:var(--red);font-weight:600}
+.kempty{color:#b3bac4;text-align:center;font-size:12px;padding:12px 0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}
+.filters input,.filters select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.filters input[type=search]{flex:1;min-width:160px;max-width:300px}
+.filters input:focus,.filters select:focus{outline:2px solid var(--soft);border-color:var(--accent)}
+.fgroup{margin-bottom:18px}
+.fghead{display:flex;align-items:center;gap:7px;font-weight:600;font-size:13px;margin-bottom:8px}
+.fghead .c{background:#e8ecf3;color:#4b5563;border-radius:20px;padding:0 7px;font-size:11px}
+.fitem{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:7px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.fitem.over{border-left-color:var(--red)}
+.fitem.tod{border-left-color:var(--amber)}
+.fmeta{color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+.fbody{flex:1;min-width:0}
+.empty{text-align:center;color:var(--muted);padding:36px 16px}
+.empty h3{margin:0 0 6px;color:var(--text);font-size:15px}
+.empty p{margin:0 0 14px;font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:36px 16px;overflow-y:auto}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:540px;box-shadow:0 20px 50px rgba(16,24,40,.25)}
+.mhead{padding:15px 18px;border-bottom:1px solid var(--line);font-weight:600;font-size:15px}
+.mbody{padding:17px}
+.mfoot{display:flex;gap:8px;padding:13px 18px;border-top:1px solid var(--line);background:#fafbfc;border-radius:0 0 12px 12px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:#374151}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--soft);border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:64px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.hint{color:var(--muted);font-size:11.5px;margin-top:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><i>P</i>Pipeline CRM</div>
+  <div class="sp"></div>
+  <button class="btn" data-action="export-csv">Export CSV</button>
+  <button class="btn pri" data-action="new">+ New deal</button>
+</header>
+
+<nav>
+  <button class="tab on" data-action="nav" data-view="dashboard">Dashboard</button>
+  <button class="tab" data-action="nav" data-view="pipeline">Pipeline</button>
+  <button class="tab" data-action="nav" data-view="deals">Deals</button>
+  <button class="tab" data-action="nav" data-view="followups">Follow-ups</button>
+  <button class="tab" data-action="nav" data-view="team">Team &amp; data</button>
+</nav>
+
+<main id="view"></main>
+<div id="modal"></div>
+<input type="file" id="file" accept="application/json" class="sr">
+
+<script>
+/* ============ state ============ */
+const KEY = 'pipeline_crm_v2';
+const STAGES = [
+  {id:'lead',        name:'Lead',        p:.10, color:'#94a3b8'},
+  {id:'qualified',   name:'Qualified',   p:.25, color:'#60a5fa'},
+  {id:'proposal',    name:'Proposal',    p:.50, color:'#818cf8'},
+  {id:'negotiation', name:'Negotiation', p:.75, color:'#e8890c'},
+  {id:'won',         name:'Won',         p:1,   color:'#0f9d58'},
+  {id:'lost',        name:'Lost',        p:0,   color:'#e5484d'}
+];
+
+const $ = (s,e=document)=>e.querySelector(s);
+const uid = ()=>Math.random().toString(36).slice(2,9);
+const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n = parseFloat(String(v ?? '').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; };
+const today = () => new Date().toLocaleDateString('sv-SE');
+const addDays = (iso,n) => { const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toLocaleDateString('sv-SE'); };
+const diff = (a,b) => Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00'))/864e5);
+const money = (n,short) => {
+  n = Number(n)||0; const s = n<0?'-':''; n = Math.abs(n);
+  if (short){
+    if (n>=1e6) return s+'$'+(n/1e6).toFixed(n>=1e7?0:1).replace(/\.0$/,'')+'M';
+    if (n>=1e3) return s+'$'+Math.round(n/1e3)+'K';
+    return s+'$'+Math.round(n);
+  }
+  return s+'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});
+};
+const fmtDate = iso => {
+  if (!iso) return '—';
+  const d = new Date(iso+'T00:00:00'); if (isNaN(d)) return '—';
+  const n = diff(today(), iso);
+  if (n===0) return 'Today'; if (n===1) return 'Tomorrow'; if (n===-1) return 'Yesterday';
+  return d.toLocaleDateString('en-US', d.getFullYear()===new Date().getFullYear()
+    ? {month:'short',day:'numeric'} : {month:'short',day:'numeric',year:'numeric'});
+};
+const init = n => (n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const stage = id => STAGES.find(s=>s.id===id) || STAGES[0];
+const isOpen = d => d.stage!=='won' && d.stage!=='lost';
+
+const DEFAULT = () => ({
+  team: ['Ama','Ben','Chi','Dee','Emeka','Femi','Grace','Hassan','Ivy','Jide','Kemi','Lola'],
+  deals: []
+});
+
+let db = load();
+let view = 'dashboard';
+let filters = { q:'', owner:'', stage:'' };
+
+function load(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw){
+      const d = JSON.parse(raw);
+      if (d && Array.isArray(d.deals) && Array.isArray(d.team)) return d;
+    }
+  } catch(e){ console.warn('Load failed', e); }
+  return DEFAULT();
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e){ alert('Could not save — browser storage may be full or blocked.'); }
+}
+
+/* ============ render dispatch ============ */
+function render(){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.view === view));
+  const fn = {dashboard:viewDashboard, pipeline:viewPipeline, deals:viewDeals,
+              followups:viewFollowups, team:viewTeam}[view] || viewDashboard;
+  $('#view').innerHTML = fn();
+}
+const filtered = () => db.deals.filter(d => {
+  const q = filters.q.toLowerCase();
+  const hit = !q || (d.title+' '+d.company+' '+d.owner+' '+d.notes).toLowerCase().includes(q);
+  return hit && (!filters.owner || d.owner===filters.owner) && (!filters.stage || d.stage===filters.stage);
+});
+
+/* ============ dashboard ============ */
+function viewDashboard(){
+  const ds = db.deals;
+  const op = ds.filter(isOpen);
+  const openVal = op.reduce((s,d)=>s+d.value,0);
+  const weighted = op.reduce((s,d)=>s+d.value*stage(d.stage).p,0);
+  const won = ds.filter(d=>d.stage==='won');
+  const wonVal = won.reduce((s,d)=>s+d.value,0);
+  const overdue = op.filter(d=>d.nextFollowUp && diff(today(),d.nextFollowUp) < 0);
+  const soon = op.filter(d=>d.nextFollowUp && diff(today(),d.nextFollowUp) >= 0 && diff(today(),d.nextFollowUp) <= 7)
+                 .sort((a,b)=>a.nextFollowUp.localeCompare(b.nextFollowUp));
+
+  const maxVal = Math.max(1, ...STAGES.map(s => ds.filter(d=>d.stage===s.id).reduce((a,d)=>a+d.value,0)));
+  const bars = STAGES.map(s => {
+    const list = ds.filter(d=>d.stage===s.id);
+    const val = list.reduce((a,d)=>a+d.value,0);
+    return `<div class="brow">
+      <span>${s.name}</span>
+      <div class="btrack"><div class="bfill" style="width:${(val/maxVal*100).toFixed(1)}%;background:${s.color}"></div></div>
+      <span class="bval">${list.length} · ${money(val,true)}</span>
+    </div>`;
+  }).join('');
+
+  const upNext = overdue.concat(soon).slice(0,6);
+  const upcoming = upNext.length ? upNext.map(d => {
+    const late = diff(today(),d.nextFollowUp) < 0;
+    return `<div class="fitem ${late?'over':''}" style="margin-bottom:6px">
+      <div class="fbody">
+        <div><strong>${esc(d.title)}</strong> <span class="sub">· ${esc(d.company)||'—'}</span></div>
+        <div class="fmeta"><span class="${late?'late':''}">${fmtDate(d.nextFollowUp)}</span>
+          <span>${esc(d.owner)||'Unassigned'}</span><span>${money(d.value)}</span></div>
+      </div>
+      <button class="btn sm" data-action="done" data-id="${d.id}">Done</button>
+    </div>`;
+  }).join('') : `<div class="none">Nothing due in the next 7 days. 🎉</div>`;
+
+  const noDeals = !ds.length ? `<div class="empty" style="padding:0">
+      <h3>No deals yet</h3>
+      <p>Add your first deal, or load sample data to try the tool out.</p>
+      <button class="btn pri" data-action="new">+ New deal</button>
+      <button class="btn" data-action="sample">Load sample data</button>
+    </div>` : '';
+
+  return `${noDeals}
+  <div class="stats">
+    <div class="stat"><div class="l">Open pipeline</div><div class="v">${money(openVal)}</div><div class="s">${op.length} open deals</div></div>
+    <div class="stat"><div class="l">Weighted forecast</div><div class="v">${money(weighted)}</div><div class="s">value × win probability</div></div>
+    <div class="stat"><div class="l">Won revenue</div><div class="v">${money(wonVal)}</div><div class="s">${won.length} closed won</div></div>
+    <div class="stat ${overdue.length?'alert':''}"><div class="l">Overdue follow-ups</div><div class="v">${overdue.length}</div><div class="s">${soon.length} due in 7 days</div></div>
+  </div>
+  <div class="two">
+    <div class="panel"><div class="phead">Pipeline by stage</div><div class="pbody">${bars}</div></div>
+    <div class="panel"><div class="phead">Up next<div class="sp"></div>
+      <button class="btn sm" data-action="nav" data-view="followups">All follow-ups</button></div>
+      <div class="pbody">${upcoming}</div></div>
+  </div>`;
+}
+
+/* ============ pipeline (kanban) ============ */
+function viewPipeline(){
+  const ds = filtered();
+  const cols = STAGES.map(s => {
+    const list = ds.filter(d=>d.stage===s.id);
+    const total = list.reduce((a,d)=>a+d.value,0);
+    const cards = list.map(d => {
+      const late = d.nextFollowUp && diff(today(),d.nextFollowUp) < 0 && isOpen(d);
+      return `<div class="kcard" draggable="true" data-id="${d.id}" data-action="edit" data-edit="1">
+        <div class="ktitle">${esc(d.title)}</div>
+        <div class="ksub">${esc(d.company)||'—'}</div>
+        <div class="kfoot"><span class="kval">${money(d.value)}</span>
+          <span class="own"><span class="av">${init(d.owner)}</span>${esc((d.owner||'').split(' ')[0]||'—')}</span></div>
+        ${d.nextFollowUp?`<div class="kfu ${late?'late':''}">⏰ ${fmtDate(d.nextFollowUp)}${late?' · overdue':''}</div>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="kcol">
+      <div class="khead"><span class="kdot" style="background:${s.color}"></span>${s.name}
+        <span class="kcount">${list.length}</span><span class="ktotal">${money(total,true)}</span></div>
+      <div class="kbody" data-stage="${s.id}">${cards||'<div class="kempty">Drop deals here</div>'}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="panel"><div class="phead">Drag a card to move it between stages
+      <div class="sp"></div><button class="btn sm" data-action="new">+ New deal</button></div>
+    <div class="pbody"><div class="kan">${cols}</div></div></div>`;
+}
+
+/* ============ deals table ============ */
+function viewDeals(){
+  const ds = filtered();
+  const rows = ds.length ? ds.map(d => {
+    const st = stage(d.stage);
+    const late = d.nextFollowUp && diff(today(),d.nextFollowUp) < 0 && isOpen(d);
+    return `<tr>
+      <td><strong>${esc(d.title)}</strong>${d.notes?`<div class="sub">${esc(d.notes).slice(0,70)}</div>`:''}</td>
+      <td>${esc(d.company)||'—'}</td>
+      <td><span class="own"><span class="av">${init(d.owner)}</span>${esc(d.owner)||'—'}</span></td>
+      <td class="t-right t-num">${money(d.value)}</td>
+      <td><span class="pill" style="background:${st.color}1f;color:${st.color}"><i style="background:${st.color}"></i>${st.name}</span></td>
+      <td class="${late?'late':''} nowrap">${fmtDate(d.nextFollowUp)}</td>
+      <td class="t-right nowrap">
+        <button class="btn sm" data-action="edit" data-id="${d.id}">Edit</button>
+        <button class="btn sm dgr" data-action="del" data-id="${d.id}">✕</button>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7" class="none">No deals match these filters.</td></tr>`;
+
+  const ownerOpts = ['<option value="">All owners</option>']
+    .concat(db.team.map(t=>`<option ${filters.owner===t?'selected':''}>${esc(t)}</option>`)).join('');
+  const stageOpts = ['<option value="">All stages</option>']
+    .concat(STAGES.map(s=>`<option value="${s.id}" ${filters.stage===s.id?'selected':''}>${s.name}</option>`)).join('');
+
+  return `<div class="panel">
+    <div class="filters">
+      <input type="search" id="q" placeholder="Search deals, companies, notes…" value="${esc(filters.q)}">
+      <select id="fOwner">${ownerOpts}</select>
+      <select id="fStage">${stageOpts}</select>
+      <div class="sp"></div>
+      <span class="sub">${ds.length} deal${ds.length===1?'':'s'} · ${money(ds.reduce((a,d)=>a+d.value,0))}</span>
+    </div>
+    <table>
+      <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th class="t-right">Value</th>
+        <th>Stage</th><th>Next follow-up</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+/* ============ follow-ups ============ */
+function viewFollowups(){
+  const op = db.deals.filter(d => isOpen(d) && d.nextFollowUp);
+  const groups = [
+    {k:'over', title:'Overdue', cls:'over', list: op.filter(d=>diff(today(),d.nextFollowUp)<0)},
+    {k:'today', title:'Due today', cls:'tod', list: op.filter(d=>diff(today(),d.nextFollowUp)===0)},
+    {k:'week', title:'Next 7 days', cls:'', list: op.filter(d=>{const n=diff(today(),d.nextFollowUp);return n>0&&n<=7;})},
+    {k:'later', title:'Later', cls:'', list: op.filter(d=>diff(today(),d.nextFollowUp)>7)}
+  ].map(g => ({...g, list:g.list.sort((a,b)=>a.nextFollowUp.localeCompare(b.nextFollowUp))}));
+
+  const body = groups.filter(g=>g.list.length).map(g => `
+    <div class="fgroup">
+      <div class="fghead">${g.title} <span class="c">${g.list.length}</span></div>
+      ${g.list.map(d => `<div class="fitem ${g.cls}">
+        <div class="fbody">
+          <div><strong>${esc(d.title)}</strong> <span class="sub">· ${esc(d.company)||'—'}</span></div>
+          <div class="fmeta"><span class="${g.cls==='over'?'late':''}">${fmtDate(d.nextFollowUp)}</span>
+            <span>${esc(d.owner)||'Unassigned'}</span>
+            <span>${stage(d.stage).name}</span>
+            <span>${money(d.value)}</span></div>
+          ${d.notes?`<div class="sub">${esc(d.notes).slice(0,110)}</div>`:''}
+        </div>
+        <button class="btn sm pri" data-action="done" data-id="${d.id}">Done</button>
+        <button class="btn sm" data-action="edit" data-id="${d.id}">Edit</button>
+      </div>`).join('')}
+    </div>`).join('');
+
+  return `<div class="panel"><div class="phead">Follow-ups
+      <div class="sp"></div><span class="sub">"Done" logs the touch and pushes the next one out 7 days</span></div>
+    <div class="pbody">${body || `<div class="empty">
+      <h3>No follow-ups scheduled</h3>
+      <p>Set a "Next follow-up" date on any open deal and it will appear here.</p>
+      <button class="btn pri" data-action="new">+ New deal</button></div>`}</div></div>`;
+}
+
+/* ============ team & data ============ */
+function viewTeam(){
+  const rows = db.team.map(t => {
+    const mine = db.deals.filter(d=>d.owner===t);
+    const op = mine.filter(isOpen);
+    const openVal = op.reduce((a,d)=>a+d.value,0);
+    const w = op.reduce((a,d)=>a+d.value*stage(d.stage).p,0);
+    const wonVal = mine.filter(d=>d.stage==='won').reduce((a,d)=>a+d.value,0);
+    const over = op.filter(d=>d.nextFollowUp && diff(today(),d.nextFollowUp)<0).length;
+    return `<tr>
+      <td><span class="own"><span class="av">${init(t)}</span>${esc(t)}</span></td>
+      <td class="t-right t-num">${op.length}</td>
+      <td class="t-right t-num">${money(openVal)}</td>
+      <td class="t-right t-num">${money(w)}</td>
+      <td class="t-right t-num">${money(wonVal)}</td>
+      <td class="t-right ${over?'late':'t-num'}">${over||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="panel"><div class="phead">Team performance</div>
+    <table><thead><tr><th>Rep</th><th class="t-right">Open deals</th><th class="t-right">Open value</th>
+      <th class="t-right">Weighted</th><th class="t-right">Won</th><th class="t-right">Overdue</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+
+  <div class="panel"><div class="phead">Add a rep</div>
+    <div class="pbody"><div class="filters" style="padding:0;border:0">
+      <input id="newRep" placeholder="Rep name" style="flex:1;max-width:260px">
+      <button class="btn" data-action="addrep">Add rep</button>
+      <span class="sub">${db.team.length} reps</span>
+    </div></div></div>
+
+  <div class="panel"><div class="phead">Backup &amp; data</div>
+    <div class="pbody">
+      <p class="sub" style="margin-top:0">Your data is stored in this browser only. Export a JSON backup regularly — that's also how you move data to another computer.</p>
+      <div class="filters" style="padding:0;border:0">
+        <button class="btn" data-action="export-json">Export JSON backup</button>
+        <button class="btn" data-action="import">Import JSON</button>
+        <button class="btn" data-action="export-csv">Export CSV</button>
+        <button class="btn" data-action="sample">Load sample data</button>
+        <div class="sp"></div>
+        <button class="btn dgr" data-action="reset">Erase everything</button>
+      </div>
+    </div></div>`;
+}
+
+/* ============ deal form ============ */
+function openForm(id){
+  const d = id ? db.deals.find(x=>x.id===id) : null;
+  const deal = d || {title:'', company:'', value:'', stage:'lead', owner:db.team[0]||'',
+                     nextFollowUp:addDays(today(),3), notes:''};
+  const stageOpts = STAGES.map(s=>`<option value="${s.id}" ${s.id===deal.stage?'selected':''}>${s.name}</option>`).join('');
+  const ownerOpts = db.team.map(t=>`<option ${t===deal.owner?'selected':''}>${esc(t)}</option>`).join('');
+
+  $('#modal').innerHTML = `<div class="overlay" data-action="closemodal">
+    <form class="modal" id="dealForm" data-id="${d?d.id:''}">
+      <div class="mhead">${d?'Edit deal':'New deal'}</div>
+      <div class="mbody">
+        <div class="field"><label>Deal name</label>
+          <input name="title" value="${esc(deal.title)}" placeholder="e.g. Website redesign" required></div>
+        <div class="row2">
+          <div class="field"><label>Company</label>
+            <input name="company" value="${esc(deal.company)}" placeholder="Acme Ltd"></div>
+          <div class="field"><label>Value ($)</label>
+            <input name="value" type="number" min="0" step="100" value="${deal.value===''?'':deal.value}" placeholder="5000"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Stage</label><select name="stage">${stageOpts}</select></div>
+          <div class="field"><label>Owner</label><select name="owner">${ownerOpts}</select></div>
+        </div>
+        <div class="field"><label>Next follow-up</label>
+          <input name="nextFollowUp" type="date" value="${deal.nextFollowUp||''}">
+          <div class="hint">Leave blank if no follow-up is needed.</div></div>
+        <div class="field"><label>Notes</label>
+          <textarea name="notes" placeholder="Context, next steps, who said what…">${esc(deal.notes)}</textarea></div>
+      </div>
+      <div class="mfoot">
+        ${d?`<button type="button" class="btn dgr sm" data-action="del" data-id="${d.id}">Delete</button>`:''}
+        <div class="sp"></div>
+        <button type="button" class="btn" data-action="closemodal">Cancel</button>
+        <button class="btn pri" type="submit">Save deal</button>
+      </div>
+    </form>
+  </div>`;
+  const first = $('#dealForm input[name=title]'); if (first) first.focus();
+}
+function closeModal(){ $('#modal').innerHTML = ''; }
+
+/* ============ actions ============ */
+function doneFollowUp(id){
+  const d = db.deals.find(x=>x.id===id); if (!d) return;
+  d.lastContacted = today();
+  d.nextFollowUp = isOpen(d) ? addDays(today(), 7) : '';
+  d.updatedAt = Date.now();
+  save(); render();
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset.action, id = el.dataset.id;
+
+  if (a === 'closemodal'){
+    if (e.target.closest('.modal')) return;   // don't close when clicking inside
+    closeModal();
+  }
+  else if (a === 'nav'){ view = el.dataset.view; closeModal(); render(); window.scrollTo(0,0); }
+  else if (a === 'new'){ openForm(); }
+  else if (a === 'edit'){ e.stopPropagation(); openForm(id); }
+  else if (a === 'del'){
+    if (confirm('Delete this deal? This cannot be undone.')){
+      db.deals = db.deals.filter(d=>d.id!==id);
+      save(); closeModal(); render();
+    }
+  }
+  else if (a === 'done'){ e.stopPropagation(); doneFollowUp(id); }
+  else if (a === 'export-csv'){ exportCSV(); }
+  else if (a === 'export-json'){ exportJSON(); }
+  else if (a === 'import'){ $('#file').click(); }
+  else if (a === 'sample'){ loadSample(); }
+  else if (a === 'reset'){
+    if (confirm('Erase ALL deals and reps? Export a backup first if unsure.')){
+      db = DEFAULT(); save(); render();
+    }
+  }
+  else if (a === 'addrep'){
+    const inp = $('#newRep'); const name = (inp && inp.value || '').trim();
+    if (!name) return;
+    if (db.team.includes(name)) return alert('That rep already exists.');
+    db.team.push(name); save(); render();
+  }
+});
+
+/* form submit */
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'dealForm') return;
+  e.preventDefault();
+  const f = e.target, g = n => f.elements[n];
+  const id = f.dataset.id;
+  const data = {
+    title: (g('title').value || '').trim() || 'Untitled deal',
+    company: (g('company').value || '').trim(),
+    value: num(g('value').value),
+    stage: g('stage').value,
+    owner: g('owner').value,
+    nextFollowUp: g('nextFollowUp').value || '',
+    notes: (g('notes').value || '').trim(),
+    updatedAt: Date.now()
+  };
+  if (id){
+    const d = db.deals.find(x=>x.id===id); if (d) Object.assign(d, data);
+  } else {
+    db.deals.push({ id: uid(), createdAt: Date.now(), lastContacted:'', ...data });
+  }
+  save(); closeModal(); render();
+});
+
+/* filters */
+document.addEventListener('input', e => {
+  if (e.target.id === 'q'){
+    filters.q = e.target.value;
+    render();
+    const box = $('#q');
+    if (box){ box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
+  }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'fOwner'){ filters.owner = e.target.value; render(); }
+  if (e.target.id === 'fStage'){ filters.stage = e.target.value; render(); }
+  if (e.target.id === 'file'){ importJSON(e.target.files[0]); e.target.value = ''; }
+});
+
+/* drag & drop */
+document.addEventListener('dragstart', e => {
+  const c = e.target.closest('.kcard'); if (!c) return;
+  c.classList.add('drag');
+  e.dataTransfer.setData('text/plain', c.dataset.id);
+  e.dataTransfer.effectAllowed = 'move';
+});
+document.addEventListener('dragend', e => {
+  const c = e.target.closest('.kcard'); if (c) c.classList.remove('drag');
+  document.querySelectorAll('.kbody').forEach(b=>b.classList.remove('over'));
+});
+document.addEventListener('dragover', e => {
+  const b = e.target.closest('.kbody'); if (!b) return;
+  e.preventDefault();
+  document.querySelectorAll('.kbody').forEach(x => x.classList.toggle('over', x===b));
+});
+document.addEventListener('drop', e => {
+  const b = e.target.closest('.kbody'); if (!b) return;
+  e.preventDefault();
+  const d = db.deals.find(x => x.id === e.dataTransfer.getData('text/plain'));
+  if (d && d.stage !== b.dataset.stage){
+    d.stage = b.dataset.stage;
+    d.updatedAt = Date.now();
+    save(); render();
+  }
+});
+
+/* ============ import / export ============ */
+function download(name, content, type){
+  const url = URL.createObjectURL(new Blob([content], {type}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportJSON(){
+  download('crm-backup-'+today()+'.json', JSON.stringify(db, null, 2), 'application/json');
+}
+function exportCSV(){
+  const head = ['Deal','Company','Owner','Value','Stage','Next follow-up','Last contacted','Notes'];
+  const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+  const rows = db.deals.map(d => [
+    d.title, d.company, d.owner, d.value, stage(d.stage).name,
+    d.nextFollowUp, d.lastContacted, d.notes
+  ].map(q).join(','));
+  download('crm-deals-'+today()+'.csv', [head.map(q).join(','), ...rows].join('\r\n'), 'text/csv');
+}
+function importJSON(file){
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d || !Array.isArray(d.deals)) throw new Error('Not a CRM backup file');
+      if (!confirm('Import ' + d.deals.length + ' deals? This replaces your current data.')) return;
+      db = { team: Array.isArray(d.team) && d.team.length ? d.team : DEFAULT().team,
+             deals: d.deals };
+      save(); render();
+    } catch(err){ alert('Import failed: ' + err.message); }
+  };
+  r.readAsText(file);
+}
+
+/* ============ sample data ============ */
+function loadSample(){
+  if (db.deals.length && !confirm('This replaces your current deals with sample data. Continue?')) return;
+  const T = today();
+  const mk = (title, company, value, stageId, owner, days, notes) => ({
+    id: uid(), title, company, value, stage: stageId, owner,
+    nextFollowUp: days === null ? '' : addDays(T, days),
+    lastContacted: '', notes, createdAt: Date.now(), updatedAt: Date.now()
+  });
+  db.deals = [
+    mk('Website redesign','Acme Ltd',18000,'proposal','Ama',2,'Proposal sent Tue. Waiting on their marketing lead.'),
+    mk('SEO retainer','Bluecrest Foods',6000,'negotiation','Ben',-3,'Said yes verbally, needs sign-off from finance.'),
+    mk('Shopify migration','Nova Retail',24500,'qualified','Chi',5,'Discovery call done. Send scope + timeline.'),
+    mk('Mobile app MVP','Kite Health',42000,'lead','Dee',-1,'Inbound from website. Qualify budget.'),
+    mk('Brand refresh','Harbour Coffee',9500,'proposal','Emeka',8,'Two locations. Decision by month end.'),
+    mk('CRM setup','Sunrise Logistics',12000,'won','Femi',null,'Closed. Kickoff scheduled.'),
+    mk('Content retainer','Greenline Legal',3600,'lead','Grace',1,'Referral from Femi.'),
+    mk('ERP integration','Delta Manufacturing',68000,'negotiation','Hassan',-6,'Legal reviewing contract. Push for signature.'),
+    mk('Social media package','Bloom Studio',4800,'lost','Ivy',null,'Went with a cheaper freelancer.'),
+    mk('Data dashboard','Prime Foods',15000,'qualified','Jide',12,''),
+    mk('E-commerce build','Lagos Threads',21000,'proposal','Kemi',-2,'Follow up on revised quote.'),
+    mk('Support contract','Cedar Clinics',7500,'won','Lola',null,'Renewal next year.')
+  ];
+  save(); render();
+}
+
+/* ============ go ============ */
+render();
+</script>
+</body>
+</html>
